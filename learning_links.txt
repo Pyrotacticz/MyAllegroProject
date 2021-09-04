@@ -1,0 +1,9 @@
+https://www.youtube.com/watch?v=dwI5b-wRLic
+
+https://en.wikipedia.org/wiki/Collision_detection#Video_games
+
+https://github.com/liballeg/allegro_wiki/wiki/Collision-Detection-2D
+
+https://github.com/liballeg/allegro_wiki/wiki/Resolution-independence
+
+https://wixtoolset.org/
