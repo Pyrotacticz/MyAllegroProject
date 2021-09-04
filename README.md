@@ -5,12 +5,12 @@ Follows this tutorial: https://github.com/liballeg/allegro_wiki/wiki/Allegro-Viv
 
 # Overview
 Game has:
-  From Tutorial:
-    A single player - the main spaceship
-    3 different types of enemies - alien ships
-    background - stars + game music
-    HUD - score and lives display
-  Additions by me:
-    spritesheet - edited for personalization
-    Title screen - Press space to play
-    background music - added from here: https://modarchive.org/
+* From Tutorial:
+  * A single player - the main spaceship
+  * 3 different types of enemies - alien ships
+  * background - stars + game music
+  * HUD - score and lives display
+* Additions by me:
+  * spritesheet - edited for personalization
+  * background music - added from here: https://modarchive.org/
+  * Title screen - Press space to play
