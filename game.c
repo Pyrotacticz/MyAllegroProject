@@ -200,7 +200,7 @@ ALLEGRO_BITMAP* sprite_grab(int x, int y, int w, int h)
 
 void sprite_init()
 {
-	sprites._sheet = al_load_bitmap("spritesheet.png");
+	sprites._sheet = al_load_bitmap("assets/spritesheet.png");
 	must_init(sprites._sheet, "spritesheet");
 
 	sprites.ship = sprite_grab(0, 0, SHIP_W, SHIP_H);
@@ -270,12 +270,12 @@ void audio_init()
 	al_init_acodec_addon();
 	al_reserve_samples(128);
 
-	sample_shot = al_load_sample("shot.flac");
+	sample_shot = al_load_sample("assets/shot.flac");
 	must_init(sample_shot, "shot sample");
 
-	sample_explode[0] = al_load_sample("explode1.flac");
+	sample_explode[0] = al_load_sample("assets/explode1.flac");
 	must_init(sample_explode[0], "explode[0] sample");
-	sample_explode[1] = al_load_sample("explode2.flac");
+	sample_explode[1] = al_load_sample("assets/explode2.flac");
 	must_init(sample_explode[1], "explode[1] sample");
 }
 
@@ -913,7 +913,7 @@ int main()
 	must_init(al_init_acodec_addon(), "audio codec");
 	must_init(al_reserve_samples(16), "reserver samples");
 
-	ALLEGRO_AUDIO_STREAM* music = al_load_audio_stream("0-space.xm", 2, 2048);
+	ALLEGRO_AUDIO_STREAM* music = al_load_audio_stream("assets/0-space.xm", 2, 2048);
 	must_init(music, "music");
 	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
 	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
