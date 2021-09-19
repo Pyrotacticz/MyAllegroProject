@@ -1,151 +1,30 @@
-// ----------------------------- main.cpp -------------------------------------
+// ---------------------------- sprites.h -------------------------------------
 
 // James Truong
 
 // Created: 8/29/2021
 
-// Last Modified: 8/29/2021
+// Last Modified: 9/19/2021
 
 // ----------------------------------------------------------------------------
 
-// Learning to use Allegro Library for the first time following tutorial and
-// online to reach the endgoal of making a small .exe file that is downloadable
-// for both friends and recruiters to view and play.
-// ----------------------------------------------------------------------------
-
-// Notes on specifications, special algorithms, and assumptions.
-
-// https://github.com/liballeg/allegro_wiki/wiki/Allegro-Vivace%3A-Input
-
-/*
-Seriously!? Okay, well while we imagine you'll have already staggered off to the bar by this point, there's a ton of stuff that can be improved with what we've already done. To name a few:
-
-First off, everything's black & white! Add some color; edit the spritesheet, tint what's already there, or make the stars random colors.
-Add some music. As we mentioned back in the sound section, The Mod Archive has tons of ol'skool music that Allegro will happily play.
-Add high score functionality; find a way for the program to remember the best score it's seen after it restarts.
-At the moment, the player can fly into aliens and nothing happens. Use collide() to check for this, and blow up both the player and the alien in question.
-Make more aliens (and perhaps stronger aliens) appear as time goes on, so the game gets progressively harder.
-When the player's ship (and THICCBOI aliens) explode, fx_add() plays the same sounds multiple times. This is inefficient; figure out how we can avoid this. There are a few ways to do it.
-The same problem occurs when THICCBOI aliens shoot, as they spawn 4 shots at a time. Try applying a similar fix there.
-Once you've done that, our call to al_reserve_samples() can be given a significantly smaller number.
-By following the instructions on Resolution Independence article, make the game fullscreen, and adaptively scale-up the graphics to fill the entire display (rather than having a window with DISP_SCALE locked at 3).
-Split up that absolutely huge game.c file. If you've not dabbled in the art of using multiple .c files, this Stack Overflow question is a good place to start.
-Add an optional second player with separate controls and score.
-*/
+// 
 
 // ----------------------------------------------------------------------------
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef SPRITES_H
+#define SPRITES_H
 #include <allegro5/allegro5.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_image.h>
 
+#include "helpers.h"
 
-long frames;
-long score;
-
-void must_init(bool test, const char* description)
-{
-	if (test) return;
-
-	printf("couldn't initialize %s\n", description);
-	exit(1);
-}
-
-int between(int lo, int hi)
-{
-	return lo + (rand() % (hi - lo));
-}
-
-float between_f(float lo, float hi)
-{
-	return lo + ((float)rand() / (float)RAND_MAX) * (hi - lo);
-}
-
-bool collide(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2)
-{
-	if (ax1 > bx2) return false;
-	if (ax2 < bx1) return false;
-	if (ay1 > by2) return false;
-	if (ay2 < by1) return false;
-	return true;
-}
-
-
-// DISPLAY
-#define BUFFER_W 320
-#define BUFFER_H 240
-
-#define DISP_SCALE 3
-#define DISP_W (BUFFER_W * DISP_SCALE)
-#define DISP_H (BUFFER_H * DISP_SCALE)
-
-ALLEGRO_DISPLAY* disp;
-ALLEGRO_BITMAP* buffer;
-
-void disp_init()
-{
-	al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
-	al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
-
-	disp = al_create_display(DISP_W, DISP_H);
-	must_init(disp, "display");
-
-	buffer = al_create_bitmap(BUFFER_W, BUFFER_H);
-	must_init(buffer, "bitmap buffer");
-}
-
-void disp_deinit()
-{
-	al_destroy_bitmap(buffer);
-	al_destroy_display(disp);
-}
-
-void disp_pre_draw()
-{
-	al_set_target_bitmap(buffer);
-}
-
-void disp_post_draw()
-{
-	al_set_target_backbuffer(disp);
-	al_draw_scaled_bitmap(buffer, 0, 0, BUFFER_W, BUFFER_H, 0, 0, DISP_W, DISP_H, 0);
-
-	al_flip_display();
-}
-
-
-// KEYBOARD
-#define KEY_SEEN 1
-#define KEY_RELEASED 2
-unsigned char key[ALLEGRO_KEY_MAX];
-
-void keyboard_init()
-{
-	memset(key, 0, sizeof(key));
-}
-
-void keyboard_update(ALLEGRO_EVENT* event)
-{
-	switch (event->type)
-	{
-	case ALLEGRO_EVENT_TIMER:
-		for (int i = 0; i < ALLEGRO_KEY_MAX; i++)
-			key[i] &= KEY_SEEN;
-		break;
-	case ALLEGRO_EVENT_KEY_DOWN:
-		key[event->keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
-		break;
-	case ALLEGRO_EVENT_KEY_UP:
-		key[event->keyboard.keycode] &= KEY_RELEASED;
-		break;
-	}
-}
-
+extern long frames;
+extern long score;
+extern const int BUFFER_H;
+extern const int BUFFER_W;
+extern unsigned char key[];
 
 // SPRITES
 #define SHIP_W 12
@@ -219,16 +98,16 @@ void sprite_init()
 	sprites.explosion[0] = sprite_grab(33, 10, 9, 9);
 	sprites.explosion[1] = sprite_grab(43, 9, 11, 11);
 	sprites.explosion[2] = sprite_grab(46, 21, 17, 18);
-    sprites.explosion[3] = sprite_grab(46, 40, 17, 17);
+	sprites.explosion[3] = sprite_grab(46, 40, 17, 17);
 
-    sprites.sparks[0] = sprite_grab(34, 0, 10, 8);
-    sprites.sparks[1] = sprite_grab(45, 0, 7, 8);
-    sprites.sparks[2] = sprite_grab(54, 0, 9, 8);
+	sprites.sparks[0] = sprite_grab(34, 0, 10, 8);
+	sprites.sparks[1] = sprite_grab(45, 0, 7, 8);
+	sprites.sparks[2] = sprite_grab(54, 0, 9, 8);
 
-    sprites.powerup[0] = sprite_grab(0, 49, 9, 12);
-    sprites.powerup[1] = sprite_grab(10, 49, 9, 12);
-    sprites.powerup[2] = sprite_grab(20, 49, 9, 12);
-    sprites.powerup[3] = sprite_grab(30, 49, 9, 12);
+	sprites.powerup[0] = sprite_grab(0, 49, 9, 12);
+	sprites.powerup[1] = sprite_grab(10, 49, 9, 12);
+	sprites.powerup[2] = sprite_grab(20, 49, 9, 12);
+	sprites.powerup[3] = sprite_grab(30, 49, 9, 12);
 }
 
 void sprites_deinit()
@@ -426,7 +305,7 @@ void shots_update()
 	{
 		if (!shots[i].used)
 			continue;
-		
+
 		if (shots[i].ship)
 		{
 			shots[i].y -= 5;
@@ -653,7 +532,7 @@ void aliens_update()
 				aliens[i].x = new_x;
 
 				aliens[i].y = between(-40, -30);
-				aliens[i].type = between(0, ALIEN_TYPE_N);
+				aliens[i].type = (ALIEN_TYPE)between(0, (int)ALIEN_TYPE_N);
 				aliens[i].shot_timer = between(1, 99);
 				aliens[i].blink = 0;
 				aliens[i].used = true;
@@ -770,239 +649,5 @@ void aliens_draw()
 }
 
 
-// BACKGROUND
-typedef struct STAR
-{
-	float y;
-	float speed;
-} STAR;
 
-#define STARS_N ((BUFFER_W /2) - 1)
-STAR stars[STARS_N];
-
-void stars_init()
-{
-	for (int i = 0; i < STARS_N; i++)
-	{
-		stars[i].y = between_f(0, BUFFER_H);
-		stars[i].speed = between_f(0.1, 1);
-	}
-}
-
-void stars_update()
-{
-	for (int i = 0; i < STARS_N; i++)
-	{
-		stars[i].y += stars[i].speed;
-		if (stars[i].y >= BUFFER_H)
-		{
-			stars[i].y = 0;
-			stars[i].speed = between_f(0.1, 1);
-		}
-	}
-}
-
-void stars_draw()
-{
-	float star_x = 1.5;
-	for (int i = 0; i < STARS_N; i++)
-	{
-		float l = stars[i].speed * 0.8;
-		al_draw_pixel(star_x, stars[i].y, al_map_rgb_f(rand() % 2 - 1, rand() % 2 - 1, rand() % 2 - 1));
-		star_x += 2;
-	}
-}
-
-
-// HUD
-ALLEGRO_FONT* font;
-long score_display;
-
-void hud_init()
-{
-	font = al_create_builtin_font();
-	must_init(font, "font");
-
-	score_display = 0;
-}
-
-void hud_deinit()
-{
-	al_destroy_font(font);
-}
-
-void hud_update()
-{
-	if (frames % 2)
-		return;
-	for (long i = 5; i > 0; i--)
-	{
-		long diff = 1 << i;
-		if (score_display <= (score - diff))
-			score_display += diff;
-	}
-}
-
-void hud_draw()
-{
-	al_draw_textf(font, al_map_rgb_f(1, 1, 1), 1, 1, 0, "%06ld", score_display);
-
-	int spacing = LIFE_W + 1;
-	for (int i = 0; i < ship.lives; i++)
-		al_draw_bitmap(sprites.life, 1 + (i * spacing), 10, 0);
-
-	if (ship.lives < 0)
-		al_draw_textf(font, al_map_rgb_f(1, 1, 1), BUFFER_W / 2, BUFFER_H / 2, ALLEGRO_ALIGN_CENTER, "G A M E  O V E R");
-}
-
-
-// TITLE SCREEN
-ALLEGRO_FONT* title;
-bool playing = false;
-
-void title_init()
-{
-	title = al_create_builtin_font();
-	must_init(font, "title");
-}
-
-void title_deinit()
-{
-	al_destroy_font(title);
-}
-
-void title_update()
-{
-	if (key[ALLEGRO_KEY_SPACE])
-		playing = true;
-}
-
-void title_draw()
-{
-	if (!playing)
-	{
-		al_draw_textf(font, al_map_rgb_f(1, 1, 1), BUFFER_W / 2, BUFFER_H / 2, ALLEGRO_ALIGN_CENTER, "SPACE SHOOTER");
-		al_draw_textf(font, al_map_rgb_f(1, 1, 1), BUFFER_W / 2, BUFFER_H - 100, ALLEGRO_ALIGN_CENTER, "PRESS SPACE");
-	}
-}
-
-// MAIN
-int main()
-{
-	must_init(al_init(), "allegro");
-	must_init(al_install_keyboard(), "keyboard");
-
-	ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
-	must_init(timer, "timer");
-
-	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-	must_init(queue, "queue");
-
-	disp_init();
-
-	audio_init();
-
-	must_init(al_init_image_addon(), "image");
-	sprite_init();
-
-	hud_init();
-
-	must_init(al_init_primitives_addon(), "primitives");
-
-	must_init(al_install_audio(), "audio");
-	must_init(al_init_acodec_addon(), "audio codec");
-	must_init(al_reserve_samples(16), "reserver samples");
-
-	ALLEGRO_AUDIO_STREAM* music = al_load_audio_stream("assets/0-space.xm", 2, 2048);
-	must_init(music, "music");
-	al_set_audio_stream_playmode(music, ALLEGRO_PLAYMODE_LOOP);
-	al_attach_audio_stream_to_mixer(music, al_get_default_mixer());
-
-	al_register_event_source(queue, al_get_keyboard_event_source());
-	al_register_event_source(queue, al_get_display_event_source(disp));
-	al_register_event_source(queue, al_get_timer_event_source(timer));
-
-	keyboard_init();
-	fx_init();
-	shots_init();
-	ship_init();
-	aliens_init();
-	stars_init();
-	title_init();
-
-	frames = 0;
-	score = 0;
-
-	bool done = false;
-	bool redraw = true;
-	ALLEGRO_EVENT event;
-
-	al_start_timer(timer);
-
-	while (1)
-	{
-		al_wait_for_event(queue, &event);
-
-		switch (event.type)
-		{
-		case ALLEGRO_EVENT_TIMER:
-			stars_update();
-			if (playing)
-			{
-				fx_update();
-				shots_update();
-				ship_update();
-				aliens_update();
-				hud_update();
-			}
-			else
-			{
-				title_update();
-			}
-
-			if (key[ALLEGRO_KEY_ESCAPE])
-				done = true;
-
-			redraw = true;
-			frames++;
-			break;
-
-		case ALLEGRO_EVENT_DISPLAY_CLOSE:
-			done = true;
-			break;
-		}
-
-		if (done)
-			break;
-
-		keyboard_update(&event);
-		
-		if (redraw && al_is_event_queue_empty(queue))
-		{
-			disp_pre_draw();
-			al_clear_to_color(al_map_rgb(0, 0, 0));
-
-			if (playing)
-				hud_draw();
-			stars_draw();
-			aliens_draw();
-			shots_draw();
-			fx_draw();
-			ship_draw();
-
-			title_draw();
-
-			disp_post_draw();
-			redraw = false;
-		}
-	}
-
-	sprites_deinit();
-	hud_deinit();
-	audio_deinit();
-	disp_deinit();
-	al_destroy_timer(timer);
-	al_destroy_event_queue(queue);
-
-	return 0;
-}
+#endif
